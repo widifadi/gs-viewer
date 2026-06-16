@@ -3,11 +3,14 @@ from plyfile import PlyData
 import os
 import argparse
 import glob
+import shapefile
+import shapely
+from shapely.geometry import shape, Polygon
 
 def sigmoid(x):
     return 1 / (1 + np.exp(-np.clip(x, -88, 88)))
 
-def ply_to_splat(ply_path, out_path, opacity_threshold=0):
+def ply_to_splat(ply_path, out_path, opacity_threshold=0, clip_polygon=None):
     print(f"Reading {ply_path} ...")
     ply = PlyData.read(ply_path)
     v = ply['vertex']
@@ -39,6 +42,20 @@ def ply_to_splat(ply_path, out_path, opacity_threshold=0):
     ry = np.array(v["rot_2"], dtype=np.float32)
     rz = np.array(v["rot_3"], dtype=np.float32)
 
+    # Optional spatial clip using polygon (vectorized with shapely 2.x)
+    if clip_polygon is not None:
+        clip_mask = shapely.contains_xy(clip_polygon, x.astype(np.float64), y.astype(np.float64))
+        x, y, z = x[clip_mask], y[clip_mask], z[clip_mask]
+        sx, sy, sz = sx[clip_mask], sy[clip_mask], sz[clip_mask]
+        r, g, b, a = r[clip_mask], g[clip_mask], b[clip_mask], a[clip_mask]
+        rw, rx, ry, rz = rw[clip_mask], rx[clip_mask], ry[clip_mask], rz[clip_mask]
+        n = int(clip_mask.sum())
+        total_before = len(clip_mask)
+        print(f"  After clip: {n:,} Gaussians ({100*n/total_before:.0f}% kept)")
+        if n == 0:
+            print("  WARNING: 0 Gaussians after clip — skipping file.")
+            return
+
     # Optional opacity pruning — apply mask to all arrays at once
     if opacity_threshold > 0:
         mask = a > opacity_threshold
@@ -46,8 +63,9 @@ def ply_to_splat(ply_path, out_path, opacity_threshold=0):
         sx, sy, sz = sx[mask], sy[mask], sz[mask]
         r, g, b, a = r[mask], g[mask], b[mask], a[mask]
         rw, rx, ry, rz = rw[mask], rx[mask], ry[mask], rz[mask]
+        total_before_prune = len(mask)
         n = int(mask.sum())
-        print(f"  After pruning: {n:,} Gaussians ({100*n/len(mask):.0f}% kept)")
+        print(f"  After pruning: {n:,} Gaussians ({100*n/total_before_prune:.0f}% kept)")
     norm = np.sqrt(rx**2 + ry**2 + rz**2 + rw**2)
     norm = np.where(norm == 0, 1.0, norm)  # Avoid division by zero
     rw /= norm; rx /= norm; ry /= norm; rz /= norm
@@ -76,7 +94,22 @@ if __name__ == "__main__":
     parser.add_argument("--output", help="Output SPLAT file folder (default: same as input folder)")
     parser.add_argument("--opacity-threshold", type=int, default=0, dest="opacity_threshold",
                         help="Remove Gaussians with opacity below this value (0-255). 0 = no pruning. Try 5-15.")
+    parser.add_argument("--clip", default=None,
+                        help="Path to a .shp file (in local PLY coordinates) to spatially clip Gaussians.")
     args = parser.parse_args()
+
+    clip_polygon = None
+    if args.clip:
+        sf = shapefile.Reader(args.clip)
+        geom = shape(sf.shape(0).__geo_interface__)
+        # PolylineZ (type 13) is read as LineString — close the ring to make a Polygon
+        if geom.geom_type == "LineString":
+            clip_polygon = Polygon(geom.coords)
+        elif geom.geom_type == "MultiLineString":
+            clip_polygon = Polygon(list(geom.geoms[0].coords))
+        else:
+            clip_polygon = geom
+        print(f"Clip polygon loaded from {args.clip} (bounds: {clip_polygon.bounds})")
 
     ply_files = glob.glob(os.path.join(args.dir, "*.ply"))
     if not ply_files:
@@ -88,4 +121,4 @@ if __name__ == "__main__":
         out_dir = args.output if args.output else args.dir
         os.makedirs(out_dir, exist_ok=True)
         out_path = os.path.join(out_dir, f"{base_name}.splat")
-        ply_to_splat(ply_path, out_path, opacity_threshold=args.opacity_threshold)
+        ply_to_splat(ply_path, out_path, opacity_threshold=args.opacity_threshold, clip_polygon=clip_polygon)
