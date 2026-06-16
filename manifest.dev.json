@@ -1,4 +1,37 @@
 {
-  "splatUrl": "./data/roads.ply",
-  "layers": []
+  "scenes": [
+  {
+    "id": "ground",
+    "label": "Ground",
+    "url": "./data/Siti_Inggil_splat/Ground.splat",
+    "visible": true, "count": 9558567
+  },
+  {
+    "id": "roofs",
+    "label": "Roofs",
+    "url": "./data/Siti_Inggil_splat/Roofs.splat",
+    "visible": true, "count": 9086211
+  },
+  {
+    "id": "vegetations",
+    "label": "Vegetations",
+    "url": "./data/Siti_Inggil_splat/Vegetations.splat",
+    "visible": true, "count": 8688076
+  },
+  {
+    "id": "water-bodies",
+    "label": "Water Bodies",
+    "url": "./data/Siti_Inggil_splat/Water-Bodies.splat",
+    "visible": true, "count": 7898972
+  }
+  ],
+  "layers": [],
+  "camera": {
+    "position": [0, 24, 110],
+    "target":   [0, 0, -20]
+  },
+  "grid": {
+    "size": 200,
+    "divisions": 20
+  }
 }
