@@ -4,8 +4,9 @@ import { loadManifest } from "./loader.js";
 import { buildUI } from "./ui.js";
 import { createGizmo } from "./gizmo.js";
 
-// TODO: replace with your Hugging Face manifest URL once uploaded
-const MANIFEST_URL = "./manifest.dev.json";
+const MANIFEST_URL = window.location.hostname === "localhost"
+  ? "./manifest.dev.json"
+  : "./manifest.json";
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
