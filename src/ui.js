@@ -1,4 +1,4 @@
-export function buildUI(manifest, splatMeshes, camera, helpers = {}) {
+export function buildUI(manifest, splatMeshes, camera, helpers = {}, createMesh = null) {
   const panel = document.createElement("div");
   panel.id = "ui-panel";
   panel.innerHTML = `
@@ -38,8 +38,14 @@ export function buildUI(manifest, splatMeshes, camera, helpers = {}) {
   };
 
   panel.querySelectorAll("input[type=checkbox]").forEach(cb => {
+    if (!cb.dataset.id) return;
     cb.addEventListener("change", () => {
-      splatMeshes[cb.dataset.id].visible = cb.checked;
+      if (cb.checked && !splatMeshes[cb.dataset.id] && createMesh) {
+        const s = manifest.scenes.find(s => s.id === cb.dataset.id);
+        if (s) createMesh(s);
+      }
+      const mesh = splatMeshes[cb.dataset.id];
+      if (mesh) mesh.visible = cb.checked;
       visibilityState[cb.dataset.id] = cb.checked;
       updateDebug();
     });

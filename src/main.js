@@ -76,18 +76,27 @@ scene.add(axesHelper);
 
 const splatMeshes = {};
 for (const s of manifest.scenes) {
-  const mesh = new SplatMesh({ url: s.url});
-  mesh.visible = s.visible ?? true;
+  if (s.visible !== false) {
+    const mesh = new SplatMesh({ url: s.url });
+    scene.add(mesh);
+    splatMeshes[s.id] = mesh;
+  }
+}
+
+const createMesh = (s) => {
+  if (splatMeshes[s.id]) return splatMeshes[s.id];
+  const mesh = new SplatMesh({ url: s.url });
   scene.add(mesh);
   splatMeshes[s.id] = mesh;
-}
+  return mesh;
+};
 
 document.getElementById("loading").style.display = "none";
 
 const sceneTarget = new THREE.Vector3(...(manifest.camera?.target ?? [0, 0, -20]));
 const gizmo = createGizmo(camera, sceneTarget);
 
-buildUI(manifest, splatMeshes, camera, { grid: gridHelper, axes: axesHelper });
+buildUI(manifest, splatMeshes, camera, { grid: gridHelper, axes: axesHelper }, createMesh);
 
 let lastTime = performance.now();
 renderer.setAnimationLoop(() => {
