@@ -27,8 +27,9 @@
   ],
   "layers": [],
   "camera": {
-    "position": [0, 24, 110],
-    "target":   [0, 0, -20]
+    "position": [0, 10, 55],
+    "target":   [0, 0, -5],
+    "fov": 75
   },
   "grid": {
     "size": 200,

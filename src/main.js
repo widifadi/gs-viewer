@@ -65,6 +65,7 @@ window.addEventListener("resize", () => {
 const manifest = await loadManifest(MANIFEST_URL);
 
 const cam = manifest.camera ?? { position: [0, 100, 80], target: [0, 0, -20] };
+if (cam.fov) { camera.fov = cam.fov; camera.updateProjectionMatrix(); }
 camera.position.set(...cam.position);
 camera.lookAt(...cam.target);
 
