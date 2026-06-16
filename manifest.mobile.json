@@ -1,0 +1,37 @@
+{
+  "scenes": [
+  {
+    "id": "ground",
+    "label": "Ground",
+    "url": "https://huggingface.co/datasets/widifadi/siti-inggil-gs/resolve/main/splats-mobile/Ground.splat",
+    "visible": true, "count": 1215992
+  },
+  {
+    "id": "roofs",
+    "label": "Roofs",
+    "url": "https://huggingface.co/datasets/widifadi/siti-inggil-gs/resolve/main/splats-mobile/Roofs.splat",
+    "visible": true, "count": 1144536
+  },
+  {
+    "id": "vegetations",
+    "label": "Vegetations",
+    "url": "https://huggingface.co/datasets/widifadi/siti-inggil-gs/resolve/main/splats-mobile/Vegetations.splat",
+    "visible": true, "count": 3102497
+  },
+  {
+    "id": "water-bodies",
+    "label": "Water Bodies",
+    "url": "https://huggingface.co/datasets/widifadi/siti-inggil-gs/resolve/main/splats-mobile/Water-Bodies.splat",
+    "visible": true, "count": 192493
+  }
+  ],
+  "layers": [],
+  "camera": {
+    "position": [0, 24, 110],
+    "target":   [0, 0, -20]
+  },
+  "grid": {
+    "size": 200,
+    "divisions": 20
+  }
+}

@@ -4,9 +4,10 @@ import { loadManifest } from "./loader.js";
 import { buildUI } from "./ui.js";
 import { createGizmo } from "./gizmo.js";
 
+const isMobile = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
 const MANIFEST_URL = window.location.hostname === "localhost"
   ? "./manifest.dev.json"
-  : "./manifest.json";
+  : isMobile ? "./manifest.mobile.json" : "./manifest.json";
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
