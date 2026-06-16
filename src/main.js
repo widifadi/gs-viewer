@@ -29,30 +29,32 @@ const fpsMovement = new FpsMovement({ moveSpeed: 2.0 });
 const pointerControls = new PointerControls({
   canvas: renderer.domElement,
   scrollSpeed: 0.02,
-  slideSpeed: 0,  // disabled — middle mouse pan replaces right-click pan
+  slideSpeed: isMobile ? 0.006 : 0,  // mobile: two-finger pan; desktop: disabled (middle mouse used instead)
 });
 
-// Middle mouse pan
-const _right = new THREE.Vector3();
-const _up = new THREE.Vector3();
-let isPanning = false;
-let lastPanX = 0, lastPanY = 0;
-renderer.domElement.addEventListener("pointerdown", e => {
-  if (e.button === 1) { isPanning = true; lastPanX = e.clientX; lastPanY = e.clientY; e.preventDefault(); }
-});
-renderer.domElement.addEventListener("pointermove", e => {
-  if (!isPanning) return;
-  const dx = e.clientX - lastPanX;
-  const dy = e.clientY - lastPanY;
-  lastPanX = e.clientX; lastPanY = e.clientY;
-  const panSpeed = camera.position.length() * 0.0002;
-  _right.setFromMatrixColumn(camera.matrix, 0);
-  _up.setFromMatrixColumn(camera.matrix, 1);
-  camera.position.addScaledVector(_right, -dx * panSpeed);
-  camera.position.addScaledVector(_up, dy * panSpeed);
-});
-renderer.domElement.addEventListener("pointerup", e => { if (e.button === 1) isPanning = false; });
-renderer.domElement.addEventListener("pointerleave", () => { isPanning = false; });
+// Middle mouse pan (desktop only)
+if (!isMobile) {
+  const _right = new THREE.Vector3();
+  const _up = new THREE.Vector3();
+  let isPanning = false;
+  let lastPanX = 0, lastPanY = 0;
+  renderer.domElement.addEventListener("pointerdown", e => {
+    if (e.button === 1) { isPanning = true; lastPanX = e.clientX; lastPanY = e.clientY; e.preventDefault(); }
+  });
+  renderer.domElement.addEventListener("pointermove", e => {
+    if (!isPanning) return;
+    const dx = e.clientX - lastPanX;
+    const dy = e.clientY - lastPanY;
+    lastPanX = e.clientX; lastPanY = e.clientY;
+    const panSpeed = camera.position.length() * 0.0002;
+    _right.setFromMatrixColumn(camera.matrix, 0);
+    _up.setFromMatrixColumn(camera.matrix, 1);
+    camera.position.addScaledVector(_right, -dx * panSpeed);
+    camera.position.addScaledVector(_up, dy * panSpeed);
+  });
+  renderer.domElement.addEventListener("pointerup", e => { if (e.button === 1) isPanning = false; });
+  renderer.domElement.addEventListener("pointerleave", () => { isPanning = false; });
+}
 
 window.addEventListener("resize", () => {
   camera.aspect = window.innerWidth / window.innerHeight;
