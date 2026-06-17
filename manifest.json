@@ -33,5 +33,6 @@
   "grid": {
     "size": 200,
     "divisions": 20
-  }
+  },
+  "videoUrl": "https://huggingface.co/datasets/widifadi/siti-inggil-gs/resolve/main/video/TorontoVideo1080p.mp4"
 }

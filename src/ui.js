@@ -76,4 +76,18 @@ export function buildUI(manifest, splatMeshes, camera, helpers = {}, createMesh 
   document.getElementById("toggle-axes")?.addEventListener("change", e => {
     if (helpers.axes) helpers.axes.visible = e.target.checked;
   });
+
+  if (manifest.videoUrl) {
+    const videoLink = document.createElement("a");
+    videoLink.href = manifest.videoUrl;
+    videoLink.target = "_blank";
+    videoLink.rel = "noopener noreferrer";
+    videoLink.textContent = "▶ Watch Video";
+    videoLink.style.cssText = isMobile
+      ? "position:fixed;bottom:50px;left:16px;color:#fff;font-family:monospace;font-size:12px;background:rgba(0,0,0,0.65);padding:5px 10px;border-radius:6px;text-decoration:none;z-index:9999;border:1px solid rgba(255,255,255,0.25)"
+      : "position:fixed;bottom:16px;right:16px;color:#fff;font-family:monospace;font-size:12px;background:rgba(0,0,0,0.65);padding:6px 12px;border-radius:6px;text-decoration:none;z-index:9999;border:1px solid rgba(255,255,255,0.25)";
+    videoLink.addEventListener("mouseenter", () => videoLink.style.background = "rgba(255,255,255,0.15)");
+    videoLink.addEventListener("mouseleave", () => videoLink.style.background = "rgba(0,0,0,0.65)");
+    document.body.appendChild(videoLink);
+  }
 }
